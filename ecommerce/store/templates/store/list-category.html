@@ -1,0 +1,56 @@
+<!--
+  menginstruksikan Django untuk memperluas (extends) template base.html
+  artinya template ini akan mewarisi semua blok dan konten dari template base.html
+-->
+{% extends "./base.html" %} 
+
+<!--
+  memuat koleksi tag-tag static
+  memungkinkan penggunaan template tag static untuk menyertakan file-file statis seperti CSS dan JavaScript
+    "file statis" itu kayak file CSS, JavaScript, gambar, dll pokoknya yang tidak berubah dan tidak dipengaruhi oleh data dari server
+    file-file ini biasanya dipakai untuk nentuin tampilan dan perilaku halaman web
+-->
+{% load static %}
+
+<!--
+  blok yang ditentukan di template base.html
+  semua konten di antara tag block content dan endblock akan diganti dengan blok konten yang sesuai dari template induk
+-->
+{% block content %}
+<main>
+  <div class="album py-5 bg-light">
+    <div class="container">
+      <!-- NAMA KATEGORI -->
+      <div class="pb-3 h5"> {{category.name | capfirst }} </div>
+      <hr>
+      <br>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+        <!--
+          loop melalui setiap produk dalam variabel products yang dipassing ke template
+        -->
+        {% for product in products %}
+        <!--
+          tiap produk ditampilkan dalam sebuah card yang berisi gambar produk, judul produk
+          (dengan hyperlink yang mengarah ke halaman detail produk), dan harga produk
+        -->
+        <div class="col">
+          <div class="card shadow-sm">
+          <!-- FOTO PRODUK -->
+          <img class="img-fluid" alt="Responsive image" src="{{product.image.url}}">
+            <div class="card-body">
+              <p class="card-text">
+                <a class="text-info text-decoration-none" href="{{product.get_absolute_url}}"> {{product.title}} </a>
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <!-- HARGA -->
+                <h5> IDR {{product.price}} </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

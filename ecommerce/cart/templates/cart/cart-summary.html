@@ -1,0 +1,195 @@
+{% include "store/base.html" %}
+<!--
+  menyertakan template store base.html
+-->
+
+{% load static %}
+<!--
+  memuat koleksi tag-tag static
+  memungkinkan penggunaan template tag static untuk menyertakan file-file statis seperti CSS dan JavaScript
+    "file statis" itu kayak file CSS, JavaScript, gambar, dll pokoknya yang tidak berubah dan tidak dipengaruhi oleh data dari server
+    file-file ini biasanya dipakai untuk nentuin tampilan dan perilaku halaman web
+-->
+
+{% load mathfilters %}
+<!--
+  memuat filter matematika tambahan untuk digunakan dalam template
+-->
+
+{% block content %}
+<!--
+  blok yang ditentukan di template base.html
+  semua konten di antara tag block content dan endblock akan diganti dengan blok konten yang sesuai dari template induk
+  bikin unik, kalo ada frotnend code di atas block ga akan keliatan
+-->
+
+<main class="pt-5">
+    <div class="container">
+      <h1 class="h5"> Shopping cart </h1>
+	    <hr>
+      <!--
+        ditampilkan di dalam layout base.html
+        memulai elemen utama (main) dan membuat div container dengan judul "Shopping cart"
+      -->
+
+      <!-- List Products -->
+      {% for item in cart %}
+        <!--
+          loop for yang akan mengiterasi setiap item di keranjang belanja
+          variabel item merepresentasikan masing-masing produk dalam keranjang
+        -->
+      {% with product=item.product %}
+      <!--
+        menggunakan tag with untuk membuat konteks baru di dalam loop di mana item product disimpan dalam variabel product
+        membuat kode lebih bersih dan mudah dibaca
+      -->
+      <br>
+      <div class="row mb-4 border product-item">
+        <div class="col-md-3 col-lg-2 order-md-first bg-light">
+ <!--
+  Product image
+  menampilkan image tiap produk
+-->
+            <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image" src="{{product.image.url}}">
+        </div>
+        <div class="col-md-9 col-lg-10 ps-md-3 ps-lg-10">
+<!--
+  Product get absolute url
+  membuat tautan yang ketika diklik akan membawa pengguna ke halaman detail produk yang sesuai
+-->
+          <a href="{{product.get_absolute_url}}" class="text-info text-decoration-none"> 
+<!--
+  Product title
+  menampilkan judul produk, jumlahnya, harga dikali jumlahnya, tombol update dan delete
+-->
+            <h1 class="h5 pt-2"> {{product.title}} </h1>
+          </a>
+          <div class="border">
+            <div class="col border-bottom">
+                <div class="row p-3">
+                <div class="col-6"> 
+                  Product 
+                </div>
+                <div class="col-6 text-end"><span class="h6 fw-bold">
+                  IDR {{product.price|mul:item.qty}} </span>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="row p-3">
+                <div class="col-12">
+                  <label for="select">Qty</label>
+                  &nbsp;
+                  <select id="select{{product.id}}">
+                    <option selected>
+                        {{item.qty}}
+                    </option>
+                    <option value="">1</option>
+                    <option value="">2</option>
+                    <option value="">3</option>
+                    <option value="">4</option>
+                    <option value="">5</option>
+                    <option value="">6</option>
+                    <option value="">7</option>
+                    <option value="">8</option>
+                    <option value="">9</option>
+                    <option value="">10</option>
+                  </select>
+                  <br> <br>
+                  <button type="button" data-index="{{product.id}}"
+                    class="btn btn-primary btn-sm update-button">
+                    Update
+                  </button>
+                  &nbsp;
+                  <button type="button" data-index="{{product.id}}"
+                    class="btn btn-danger btn-sm delete-button">
+                    Delete
+                  </button>
+                </div>
+            </div>
+            </div>
+            </div>
+        </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+<!-- List Products -->
+      <div class="col-12 text-end">
+ <!--
+  Total Cart
+  menampilkan jumlah total harga yang perlu dibayar
+-->
+        <div class="h6 fw-bold">
+          Total price: IDR <div id="total" class="d-inline-flex"> {{cart.get_total}} </div>
+        </div>
+        <br>
+<!--
+  Proceed to Checkout
+  menampilkan tombol untuk memproses check out
+-->
+        <a href="" class="btn btn-primary my-2"> <i class="fa fa-chevron-circle-right" aria-hidden="true"></i> &nbsp; Proceed to checkout </a>
+      </div>
+    </div>
+    <br>
+    <br>
+ </main>
+ <script>
+
+// Delete button
+  $(document).on('click', '.delete-button', function(e){
+    //menggunakan jQuery untuk mengikat event click pada elemen dengan kelas delete-button
+    //.delete-button = selektor jQuery yang merujuk pada elemen HTML dengan kelas delete-button
+    //function(e) = callback function yang dijalankan ketika event click terjadi. Parameter e merujuk pada objek event.
+    //. mean class
+      e.preventDefault();
+      //biar ga ngerefresh pas tombol diklik
+      $.ajax({
+      //http request ke backend, tipe post ke url cart-delete
+          type: 'POST', 
+          url: '{% url "cart-delete" %}',
+          data: {
+              product_id: $(this).data('index'),
+              csrfmiddlewaretoken: "{{csrf_token}}",
+              action: 'post'
+              //ketiganya request body
+          },
+          success: function(json){
+              //console.log(json)
+              location.reload(true);        
+              document.getElementById("cart-qty").textContent = json.qty
+              document.getElementById("total").textContent = json.total
+          },
+          error: function(xhr, errmsg, err){
+          }
+      });
+  })
+
+
+  // Update button
+  $(document).on('click', '.update-button', function(e){
+    e.preventDefault();
+    var theproductid = $(this).data('index');
+    $.ajax({
+        type: 'POST',
+        url: '{% url "cart-update" %}',
+        data: {
+            product_id: $(this).data('index'),
+            product_quantity: $('#select' + theproductid + ' option:selected').text(),
+            csrfmiddlewaretoken: "{{csrf_token}}",
+            action: 'post'
+        },
+        success: function(json){
+            //console.log(json)
+            location.reload(true);
+            document.getElementById("cart-qty").textContent = json.qty
+            document.getElementById("total").textContent = json.total
+        },
+        error: function(xhr, errmsg, err){
+        }
+    });
+  })
+ </script>
+
+
+{% endblock %}
+

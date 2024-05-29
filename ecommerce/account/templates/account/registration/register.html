@@ -1,0 +1,61 @@
+{% include "store/base.html" %}
+<!--
+    menggunakan template base.html dari folder store sebagai template dasar
+-->
+{% load static %}
+<!--
+  memuat koleksi tag-tag static
+  memungkinkan penggunaan template tag static untuk menyertakan file-file statis seperti CSS dan JavaScript
+    "file statis" itu kayak file CSS, JavaScript, gambar, dll pokoknya yang tidak berubah dan tidak dipengaruhi oleh data dari server
+    file-file ini biasanya dipakai untuk nentuin tampilan dan perilaku halaman web
+-->
+{% load crispy_forms_tags %}
+<!--
+   memuat tag crispy_forms_tags yang digunakan untuk merender form dengan gaya "crispy-forms"
+-->
+{% block content %}
+<!--
+  blok yang ditentukan di template base.html
+  semua konten di antara tag block content dan endblock akan diganti dengan blok konten yang sesuai dari template induk
+  bikin unik, kalo ada frotnend code di atas block ga akan keliatan
+-->
+    <body>
+        <br>
+        <div class="container bg-white shadow-sm p-5">
+            <h3>Create Your Account</h3>
+            <h5>Don't Miss Out Your Favorite Books!</h5>
+            <br> <br>
+            <!--
+                membuat struktur HTML dasar untuk halaman pendaftaran akun
+                terdapat judul halaman dan subjudul ditampilkan
+            -->
+            <form method="POST" autocomplete="off">
+            <!--
+            membuat form HTML yang menggunakan metode POST untuk mengirimkan data dan menonaktifkan fitur autocomplete
+            -->
+                {% csrf_token %}
+                <!--
+                    menyisipkan token CSRF (Cross-Site Request Forgery) untuk melindungi form dari serangan CSRF
+                -->
+                {{form.username|as_crispy_field}}
+                <br> <br>
+                {{form.email|as_crispy_field}}
+                <br> <br>
+                {{form.password1|as_crispy_field}}
+                <br> <br>
+                {{form.password2|as_crispy_field}}
+                <br> <br>
+                <!--
+                    merender field form untuk username, email, password1, dan password2
+                    menggunakan filter as_crispy_field untuk menerapkan gaya "crispy-forms"
+                -->
+                <button type="submit" class="btn btn-primary navbar-btn text-white w-100 p-2"> &nbsp;
+                    Create account
+                </button>
+                <!--
+                    membuat tombol submit
+                -->
+            </form>
+        </div>
+    </body>
+{% endblock %}
