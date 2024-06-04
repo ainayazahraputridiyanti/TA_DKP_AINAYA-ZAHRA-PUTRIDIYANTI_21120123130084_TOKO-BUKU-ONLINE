@@ -1,0 +1,65 @@
+{% include "store/base.html" %}
+<!--
+    menggunakan template base.html dari folder store sebagai template dasar
+-->
+{% load static %}
+<!--
+  memuat koleksi tag-tag static
+  memungkinkan penggunaan template tag static untuk menyertakan file-file statis seperti CSS dan JavaScript
+    "file statis" itu kayak file CSS, JavaScript, gambar, dll pokoknya yang tidak berubah dan tidak dipengaruhi oleh data dari server
+    file-file ini biasanya dipakai untuk nentuin tampilan dan perilaku halaman web
+-->
+{% load crispy_forms_tags %}
+<!--
+   memuat tag crispy_forms_tags yang digunakan untuk merender form dengan gaya "crispy-forms"
+-->
+{% block content %}
+<!--
+  blok yang ditentukan di template base.html
+  semua konten di antara tag block content dan endblock akan diganti dengan blok konten yang sesuai dari template induk
+  bikin unik, kalo ada frotnend code di atas block ga akan keliatan
+-->
+    <style>
+        body{
+            background-color: gray;
+        }
+    </style>
+
+    <body>
+        <br>
+        <div class="container bg-white shadow-sm p-5 form-layout">
+            <h4><strong> Welcome to Bibliophile, {{user}}! </strong></h4>
+            <hr>
+            <h5> Don't Miss Out Your Favorite Books! </h5>
+            <hr>
+            <p> Here is what you can do: </p>
+            <li> Manage Your Account </li>
+            <li> Track Your Orders </li>
+        </div>
+        <br>
+        <div class="container bg-white shadow-sm p-5 form-layout">
+            <h4><strong> Manage Your Account </strong></h4>
+            <hr>
+            <h5> Don't Miss Out Your Favorite Books! </h5>
+            <br> 
+            <a class="btn btn-primary navbar-btn text-white" type="button"  href="{% url 'profile-management' %}">
+                User Profile
+            </a>
+            <br>
+            <br>
+            <a class="btn btn-danger navbar-btn text-white" type="button"  href="{% url 'user-logout' %}">
+                Log Out
+            </a>
+            
+            <br>
+        </div>
+        <br>
+        <div class="container bg-white shadow-sm p-5 form-layout">
+            <h4><strong> Track Your Orders </strong></h4>
+            <hr> <br>
+            <a class="btn btn-primary navbar-btn text-white" type="button"  href="{% url 'user-logout' %}">
+                My Orders
+            </a>
+        </div>
+        <br>
+{% endblock %}
